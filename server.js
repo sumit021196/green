@@ -8,8 +8,23 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Configure CORS
+const corsOptions = {
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:8888',
+        'https://*.netlify.app',
+        'https://blue-hope-website.netlify.app',
+        'https://bluehope.netlify.app',
+        'https://blue-hope.netlify.app'
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+    credentials: true
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
@@ -257,30 +272,71 @@ app.get('/api/list-files', async (req, res) => {
             });
         }
 
-        const { data, error } = await supabase
+        // Verify environment variables
+        if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+            console.error('Missing Supabase configuration');
+            return res.status(500).json({
+                error: 'Server configuration error',
+                details: 'Missing Supabase credentials'
+            });
+        }
+
+        // First, get all files from storage
+        const { data: storageFiles, error: storageError } = await supabase
             .storage
             .from('financial-results')
             .list();
 
-        if (error) {
-            console.error('Storage list error:', error);
+        if (storageError) {
+            console.error('Storage list error:', storageError);
             return res.status(500).json({ 
                 error: 'Failed to list files',
-                details: error.message,
-                code: error.code
+                details: storageError.message,
+                code: storageError.code,
+                hint: storageError.hint
             });
         }
 
-        if (!data) {
-            console.error('No data returned from storage');
-            return res.status(500).json({ 
-                error: 'Failed to list files',
-                details: 'No data returned from storage'
+        if (!storageFiles || storageFiles.length === 0) {
+            console.log('No files found in storage');
+            return res.json([]);
+        }
+
+        // Get all records from the database
+        const { data: dbRecords, error: dbError } = await supabase
+            .from('financial_results')
+            .select('*');
+
+        if (dbError) {
+            console.error('Database query error:', dbError);
+            return res.status(500).json({
+                error: 'Failed to fetch database records',
+                details: dbError.message
             });
         }
 
-        console.log('Files in storage:', JSON.stringify(data, null, 2));
-        res.json(data);
+        // Create a map of existing database records
+        const dbRecordMap = new Map(
+            (dbRecords || []).map(record => [
+                record.file_path,
+                record
+            ])
+        );
+
+        // Combine storage files with database records
+        const combinedFiles = storageFiles.map(file => {
+            const dbRecord = dbRecordMap.get(file.name);
+            return {
+                ...file,
+                year: dbRecord?.year || parseInt(file.name.match(/(\d{4})/)[1]),
+                quarter: dbRecord?.quarter || file.name.match(/Q(\d)/)[1],
+                website: dbRecord?.website || 'default',
+                uploaded_at: dbRecord?.uploaded_at || file.created_at
+            };
+        });
+
+        console.log('Combined files:', JSON.stringify(combinedFiles, null, 2));
+        res.json(combinedFiles);
     } catch (error) {
         console.error('Error listing files:', error);
         res.status(500).json({ 

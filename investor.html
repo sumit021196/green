@@ -110,14 +110,20 @@
                 console.log('Fetching reports...');
                 const response = await fetch('/api/list-files', {
                     headers: {
-                        'Accept': 'application/json'
-                    }
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'include'
                 });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
                 
                 if (!response.ok) {
                     let errorMessage = 'Failed to fetch reports';
                     try {
                         const errorData = await response.json();
+                        console.error('Error response:', errorData);
                         errorMessage = errorData.details || errorData.error || errorMessage;
                     } catch (e) {
                         console.error('Error parsing error response:', e);
@@ -140,15 +146,18 @@
 
                 // Sort files by year and quarter
                 files.sort((a, b) => {
-                    const [yearA, quarterA] = a.name.match(/(\d{4})-Q(\d)/).slice(1);
-                    const [yearB, quarterB] = b.name.match(/(\d{4})-Q(\d)/).slice(1);
+                    const yearA = a.year || parseInt(a.name.match(/(\d{4})/)[1]);
+                    const yearB = b.year || parseInt(b.name.match(/(\d{4})/)[1]);
+                    const quarterA = a.quarter || a.name.match(/Q(\d)/)[1];
+                    const quarterB = b.quarter || b.name.match(/Q(\d)/)[1];
                     return yearB - yearA || quarterB - quarterA;
                 });
 
                 pdfGrid.innerHTML = files.map(file => {
-                    const [year, quarter] = file.name.match(/(\d{4})-Q(\d)/).slice(1);
+                    const year = file.year || file.name.match(/(\d{4})/)[1];
+                    const quarter = file.quarter || file.name.match(/Q(\d)/)[1];
                     const size = (file.metadata.size / 1024).toFixed(1); // Convert to KB
-                    const date = new Date(file.created_at).toLocaleDateString();
+                    const date = new Date(file.uploaded_at || file.created_at).toLocaleDateString();
 
                     return `
                         <div class="pdf-card">
