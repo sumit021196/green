@@ -108,11 +108,26 @@
             
             try {
                 console.log('Fetching reports...');
-                const response = await fetch('/api/list-files');
+                const response = await fetch('/api/list-files', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
                 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.details || 'Failed to fetch reports');
+                    let errorMessage = 'Failed to fetch reports';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.details || errorData.error || errorMessage;
+                    } catch (e) {
+                        console.error('Error parsing error response:', e);
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Server returned non-JSON response');
                 }
 
                 const files = await response.json();
