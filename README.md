@@ -1,6 +1,6 @@
 # Blue Hope Website
 
-A responsive website for Blue Hope with investor relations functionality, built using Express.js and Supabase.
+A responsive website for Blue Hope featuring financial reports and investor information.
 
 ## Features
 
@@ -11,36 +11,65 @@ A responsive website for Blue Hope with investor relations functionality, built 
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
-- npm (Node Package Manager)
-- Supabase account and project
+- Node.js (v18 or higher)
+- npm or yarn
+- Supabase account
 
-## Setup
+## Environment Variables
 
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd blue-hope-website
+Create a `.env` file in the root directory with the following variables:
+
+```
+REACT_APP_SUPABASE_URL=your_supabase_url
+REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+REACT_APP_API_URL=http://localhost:3000
 ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+## Development Setup
 
-3. Create a `.env` file in the root directory with your Supabase credentials:
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_anon_key
-PORT=3000
-```
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-4. Start the development server:
-```bash
-npm start
-```
+2. Start the development server:
+   ```bash
+   npm start
+   ```
 
-The application will be available at http://localhost:3000
+3. Start the backend server:
+   ```bash
+   npm run server
+   ```
+
+## Production Build
+
+1. Create a production build:
+   ```bash
+   npm run build
+   ```
+
+2. Test the production build locally:
+   ```bash
+   npm run start:prod
+   ```
+
+## Deployment
+
+The application is configured for deployment on Netlify. The deployment process is automated through the `netlify.toml` configuration file.
+
+### Manual Deployment Steps
+
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+
+2. Deploy to Netlify:
+   - Connect your GitHub repository to Netlify
+   - Set the build command to `npm run build`
+   - Set the publish directory to `build`
+   - Add the required environment variables in the Netlify dashboard
 
 ## Project Structure
 
@@ -51,16 +80,18 @@ The application will be available at http://localhost:3000
 
 ## API Endpoints
 
-- `GET /api/results` - Get financial results
-- `GET /api/list-files` - List PDF files in storage
-- `GET /view-pdf` - View PDF in browser
-- `GET /api/download-report` - Download PDF file
-- `POST /api/upload` - Upload new PDF file
+- `GET /api/results` - Fetch financial results
+- `GET /view-pdf` - View PDF reports
+- `GET /api/download-report` - Download PDF reports
 
-## Technologies Used
+## Contributing
 
-- Express.js
-- Supabase
-- HTML5/CSS3
-- JavaScript (ES6+)
-- Node.js 
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is proprietary and confidential. 

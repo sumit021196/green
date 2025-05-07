@@ -17,7 +17,11 @@ function Investor() {
       setError(null);
       console.log('Fetching reports...');
       
-      const response = await fetch('http://localhost:3000/api/list-files', {
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? '/.netlify/functions/api/list-files'
+        : 'http://localhost:3000/api/list-files';
+
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
