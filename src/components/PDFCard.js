@@ -27,7 +27,7 @@ function PDFCard({ file }) {
             View
           </a>
           <a
-            href={`/api/download-report?year=${year}&quarter=Q${quarter}`}
+            href={`/.netlify/functions/api/download-report?year=${year}&quarter=Q${quarter}`}
             className="btn btn-secondary"
           >
             Download
