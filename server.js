@@ -234,6 +234,16 @@ app.post('/api/upload', upload.single('pdf'), async (req, res) => {
 app.get('/api/list-files', async (req, res) => {
     try {
         console.log('Attempting to list files from storage...');
+        
+        // Verify Supabase connection
+        if (!supabase) {
+            console.error('Supabase client not initialized');
+            return res.status(500).json({ 
+                error: 'Server configuration error',
+                details: 'Database connection not initialized'
+            });
+        }
+
         const { data, error } = await supabase
             .storage
             .from('financial-results')
@@ -241,15 +251,41 @@ app.get('/api/list-files', async (req, res) => {
 
         if (error) {
             console.error('Storage list error:', error);
-            throw error;
+            return res.status(500).json({ 
+                error: 'Failed to list files',
+                details: error.message,
+                code: error.code
+            });
+        }
+
+        if (!data) {
+            console.error('No data returned from storage');
+            return res.status(500).json({ 
+                error: 'Failed to list files',
+                details: 'No data returned from storage'
+            });
         }
 
         console.log('Files in storage:', JSON.stringify(data, null, 2));
         res.json(data);
     } catch (error) {
         console.error('Error listing files:', error);
-        res.status(500).json({ error: 'Failed to list files', details: error.message });
+        res.status(500).json({ 
+            error: 'Failed to list files',
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    res.status(500).json({
+        error: 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? err.message : 'An unexpected error occurred',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
 });
 
 // For local development
@@ -259,5 +295,5 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-// For Vercel
+// For production (Vercel)
 module.exports = app; 
