@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000;
 const corsOptions = {
     origin: [
         'http://localhost:3000',
-        'http://localhost:8888',
+        'http://localhost:3001',
         'https://*.netlify.app',
         'https://blue-hope-website.netlify.app',
         'https://bluehope.netlify.app',
@@ -26,7 +26,7 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'build')));
 
 // Error handling for JSON parsing
 app.use((err, req, res, next) => {
@@ -139,12 +139,19 @@ app.get('/api/results', async (req, res) => {
     }
 });
 
-// GET /view-pdf endpoint to view PDF in browser
+// GET /view-pdf endpoint
 app.get('/view-pdf', async (req, res) => {
     try {
         const { year, quarter } = req.query;
-        const fileName = `financial-results-${year}-${quarter}.pdf`;
         
+        if (!year || !quarter) {
+            return res.status(400).json({
+                error: 'Missing required parameters',
+                details: 'Year and quarter are required'
+            });
+        }
+
+        const fileName = `financial-results-${year}-${quarter}.pdf`;
         console.log('Attempting to view PDF:', fileName);
 
         const { data, error } = await supabase
@@ -157,14 +164,33 @@ app.get('/view-pdf', async (req, res) => {
             throw error;
         }
 
-        console.log('PDF data received, size:', data ? data.length : 'undefined');
+        if (!data) {
+            return res.status(404).json({
+                error: 'File not found',
+                details: `No PDF found for year ${year} quarter ${quarter}`
+            });
+        }
 
+        // Convert Blob to Buffer
+        const arrayBuffer = await data.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        // Set appropriate headers for PDF viewing
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=${fileName}`);
-        res.send(data);
+        res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+        res.setHeader('Content-Length', buffer.length);
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
+        // Send the buffer
+        res.send(buffer);
     } catch (error) {
         console.error('Error viewing PDF:', error);
-        res.status(500).json({ error: 'Failed to view PDF', details: error.message });
+        res.status(500).json({ 
+            error: 'Failed to view PDF', 
+            details: error.message 
+        });
     }
 });
 
@@ -172,8 +198,15 @@ app.get('/view-pdf', async (req, res) => {
 app.get('/api/download-report', async (req, res) => {
     try {
         const { year, quarter } = req.query;
-        const fileName = `financial-results-${year}-${quarter}.pdf`;
         
+        if (!year || !quarter) {
+            return res.status(400).json({
+                error: 'Missing required parameters',
+                details: 'Year and quarter are required'
+            });
+        }
+
+        const fileName = `financial-results-${year}-${quarter}.pdf`;
         console.log('Attempting to download PDF:', fileName);
 
         const { data, error } = await supabase
@@ -184,6 +217,13 @@ app.get('/api/download-report', async (req, res) => {
         if (error) {
             console.error('Error downloading PDF:', error);
             throw error;
+        }
+
+        if (!data) {
+            return res.status(404).json({
+                error: 'File not found',
+                details: `No PDF found for year ${year} quarter ${quarter}`
+            });
         }
 
         // Convert Blob to Buffer
@@ -202,7 +242,10 @@ app.get('/api/download-report', async (req, res) => {
         res.send(buffer);
     } catch (error) {
         console.error('Error downloading report:', error);
-        res.status(500).json({ error: 'Failed to download report', details: error.message });
+        res.status(500).json({ 
+            error: 'Failed to download report', 
+            details: error.message 
+        });
     }
 });
 
@@ -258,91 +301,44 @@ app.post('/api/upload', upload.single('pdf'), async (req, res) => {
     }
 });
 
-// GET /api/list-files endpoint to check storage bucket
+// GET /api/list-files endpoint
 app.get('/api/list-files', async (req, res) => {
     try {
-        console.log('Attempting to list files from storage...');
+        console.log('Fetching files from storage...');
         
-        // Verify Supabase connection
-        if (!supabase) {
-            console.error('Supabase client not initialized');
-            return res.status(500).json({ 
-                error: 'Server configuration error',
-                details: 'Database connection not initialized'
-            });
-        }
-
-        // Verify environment variables
-        if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
-            console.error('Missing Supabase configuration');
-            return res.status(500).json({
-                error: 'Server configuration error',
-                details: 'Missing Supabase credentials'
-            });
-        }
-
-        // First, get all files from storage
-        const { data: storageFiles, error: storageError } = await supabase
+        const { data, error } = await supabase
             .storage
             .from('financial-results')
             .list();
 
-        if (storageError) {
-            console.error('Storage list error:', storageError);
-            return res.status(500).json({ 
-                error: 'Failed to list files',
-                details: storageError.message,
-                code: storageError.code,
-                hint: storageError.hint
-            });
+        if (error) {
+            console.error('Error listing files:', error);
+            throw error;
         }
 
-        if (!storageFiles || storageFiles.length === 0) {
-            console.log('No files found in storage');
+        if (!data || data.length === 0) {
             return res.json([]);
         }
 
-        // Get all records from the database
-        const { data: dbRecords, error: dbError } = await supabase
-            .from('financial_results')
-            .select('*');
-
-        if (dbError) {
-            console.error('Database query error:', dbError);
-            return res.status(500).json({
-                error: 'Failed to fetch database records',
-                details: dbError.message
-            });
-        }
-
-        // Create a map of existing database records
-        const dbRecordMap = new Map(
-            (dbRecords || []).map(record => [
-                record.file_path,
-                record
-            ])
-        );
-
-        // Combine storage files with database records
-        const combinedFiles = storageFiles.map(file => {
-            const dbRecord = dbRecordMap.get(file.name);
+        // Process the files to extract year and quarter information
+        const processedFiles = data.map(file => {
+            const match = file.name.match(/financial-results-(\d{4})-Q(\d)\.pdf/);
             return {
-                ...file,
-                year: dbRecord?.year || parseInt(file.name.match(/(\d{4})/)[1]),
-                quarter: dbRecord?.quarter || file.name.match(/Q(\d)/)[1],
-                website: dbRecord?.website || 'default',
-                uploaded_at: dbRecord?.uploaded_at || file.created_at
+                name: file.name,
+                year: match ? parseInt(match[1]) : null,
+                quarter: match ? match[2] : null,
+                metadata: file.metadata,
+                uploaded_at: file.created_at
             };
         });
 
-        console.log('Combined files:', JSON.stringify(combinedFiles, null, 2));
-        res.json(combinedFiles);
+        console.log('Sending processed files:', processedFiles);
+        res.json(processedFiles);
     } catch (error) {
         console.error('Error listing files:', error);
         res.status(500).json({ 
-            error: 'Failed to list files',
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            error: 'Failed to list files', 
+            details: error.message 
         });
     }
 });
@@ -360,17 +356,21 @@ app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     res.status(500).json({
         error: 'Internal server error',
-        details: process.env.NODE_ENV === 'development' ? err.message : 'An unexpected error occurred',
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        details: process.env.NODE_ENV === 'development' ? err.message : 'An unexpected error occurred'
     });
 });
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(port, () => {
-        console.log(`Server running at http://localhost:${port}`);
+// For production, serve the React app
+if (process.env.NODE_ENV === 'production') {
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, 'build', 'index.html'));
     });
 }
+
+// Start server
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
 
 // For production (Vercel)
 module.exports = app; 

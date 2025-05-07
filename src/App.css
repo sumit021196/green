@@ -1,0 +1,33 @@
+:root {
+    --primary-color: #1E90FF;
+    --secondary-color: #F4F4F4;
+    --accent-color: #FFD700;
+    --text-color: #333333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    color: var(--text-color);
+    background-color: var(--secondary-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+}
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    padding: 2rem;
+} 
