@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Relations - Blue Hope</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .pdf-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .pdf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .pdf-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .pdf-card:hover {
+            transform: translateY(-5px);
+        }
+        .pdf-card h3 {
+            margin: 0 0 1rem 0;
+            color: #333;
+        }
+        .pdf-card .date {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .pdf-card .actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            text-align: center;
+            padding: 1rem;
+            background: #f8d7da;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        .size-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Blue Hope</div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="investor.html">Investor Relation</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main class="pdf-container">
+        <h1>Financial Reports</h1>
+        <div id="pdfGrid" class="pdf-grid">
+            <div class="loading">Loading reports...</div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const pdfGrid = document.getElementById('pdfGrid');
+            
+            try {
+                const response = await fetch('/api/list-files');
+                const files = await response.json();
+
+                if (!files || files.length === 0) {
+                    pdfGrid.innerHTML = '<div class="error">No reports available</div>';
+                    return;
+                }
+
+                // Sort files by year and quarter
+                files.sort((a, b) => {
+                    const [yearA, quarterA] = a.name.match(/(\d{4})-Q(\d)/).slice(1);
+                    const [yearB, quarterB] = b.name.match(/(\d{4})-Q(\d)/).slice(1);
+                    return yearB - yearA || quarterB - quarterA;
+                });
+
+                pdfGrid.innerHTML = files.map(file => {
+                    const [year, quarter] = file.name.match(/(\d{4})-Q(\d)/).slice(1);
+                    const size = (file.metadata.size / 1024).toFixed(1); // Convert to KB
+                    const date = new Date(file.created_at).toLocaleDateString();
+
+                    return `
+                        <div class="pdf-card">
+                            <h3>Financial Report ${year} Q${quarter}</h3>
+                            <div class="date">Uploaded: ${date}</div>
+                            <div class="size-info">Size: ${size} KB</div>
+                            <div class="actions">
+                                <a href="/view-pdf?year=${year}&quarter=Q${quarter}" 
+                                   class="btn btn-primary" 
+                                   target="_blank">View</a>
+                                <a href="/api/download-report?year=${year}&quarter=Q${quarter}" 
+                                   class="btn btn-secondary">Download</a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error fetching reports:', error);
+                pdfGrid.innerHTML = '<div class="error">Failed to load reports. Please try again later.</div>';
+            }
+        });
+    </script>
+    <script src="js/main.js"></script>
+</body>
+</html> 

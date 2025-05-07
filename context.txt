@@ -1,0 +1,61 @@
+Project: Responsive Website for Blue Hope
+
+Company Name: Blue Hope
+
+Objective:  
+Create a fully responsive website that works seamlessly on both desktop and mobile devices.
+
+Color Scheme:
+- Primary Color: #1E90FF (Dodger Blue - symbolizing clean energy and hope)
+- Secondary Color: #F4F4F4 (Light Gray background for clean layout)
+- Accent Color: #FFD700 (Golden Yellow - representing solar energy)
+- Text Color: #333333 (Dark Gray for readability)
+
+Typography:
+- Headings: "Poppins", sans-serif
+- Body Text: "Open Sans", sans-serif
+
+Layout Instructions:
+
+*1. Navbar:*
+- Desktop View:
+  - Left side: Blue Hope logo (use placeholder image or text)
+  - Right side: Menu items — About, Investor Relation, Contact
+- Mobile View:
+  - Left side: Blue Hope logo
+  - Right side: Hamburger menu which toggles navigation drawer or dropdown with the same menu items
+
+*2. Pages:*
+Use **blank body content** (no hero section, no services, no dummy text) for all pages except for the Investor Relation page.
+
+- Home Page (`index.html`):
+  - Blank body
+
+- About Page (`about.html`):
+  - Blank body
+
+- Investor Relation Page (`investor.html`):
+  - A single **card component** generated dynamically to allow download of the company's **Annual Report**
+  - This content is fetched using an **already formed Express backend** and **Supabase database**
+  - Card includes:
+    - Title: "Annual Report"
+    - Description: "Download the latest annual financial performance report"
+    - A button labeled "Download PDF"
+    - Button action: fetches and downloads file from backend endpoint
+
+- Contact Page (`contact.html`):
+  - Blank body
+
+*3. Responsive Behavior:*
+- Use Flexbox/Grid and media queries to adapt layout to various screen sizes.
+- Ensure readable font sizes and button tap targets on mobile.
+- Smooth collapsing of nav items into hamburger menu for screens < 768px.
+
+*Assets:*
+- Logo placeholder: Use "Blue Hope" as stylized text in Dodger Blue color
+- Images: Not required (blank pages)
+
+*Other Notes:*
+- Ensure WCAG contrast compliance for accessibility.
+- Animate hamburger menu using simple CSS transitions.
+- Fetch report data dynamically from the backend using JavaScript.
