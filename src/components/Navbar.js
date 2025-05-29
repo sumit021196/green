@@ -4,9 +4,18 @@ import './Navbar.css';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  // For mobile: toggle dropdown on click
+  const handleDropdownClick = (e) => {
+    if (window.innerWidth <= 768) {
+      e.preventDefault();
+      setDropdownOpen((open) => !open);
+    }
   };
 
   return (
@@ -20,7 +29,35 @@ function Navbar() {
       <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
         <li><Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
         <li><Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
-        <li><Link to="/investor" onClick={() => setIsMenuOpen(false)}>Investor Relation</Link></li>
+        <li className="dropdown"
+            onMouseEnter={() => setDropdownOpen(true)}
+            onMouseLeave={() => setDropdownOpen(false)}
+        >
+          <span className="dropdown-title">Investor Relation</span>
+          <ul className={`dropdown-menu${dropdownOpen ? ' show' : ''}`}>
+            <li><Link to="/investor" onClick={() => setIsMenuOpen(false)}>Financial Results</Link></li>
+            <li><Link to="/investor/shareholding" onClick={() => setIsMenuOpen(false)}>Shareholding Pattern</Link></li>
+            <li><Link to="/investor/disclosure" onClick={() => setIsMenuOpen(false)}>Stock Exchange Disclosure</Link></li>
+            <li><Link to="/investor/grievance" onClick={() => setIsMenuOpen(false)}>Investor Grievance</Link></li>
+            <li className="has-submenu">
+              <div className="submenu-container">
+                <span>Code Of Conduct</span>
+                <span className="submenu-arrow">&#8250;</span>
+              </div>
+              {/* Submenu can be implemented here */}
+            </li>
+            <li><Link to="/investor/statutory-document" onClick={() => setIsMenuOpen(false)}>Statutory Document</Link></li>
+            <li className="has-submenu">
+              <div className="submenu-container">
+                <span>Shareholder's Help Desk</span>
+                <span className="submenu-arrow">&#8250;</span>
+              </div>
+              {/* Submenu can be implemented here */}
+            </li>
+            <li><Link to="/investor/policies" onClick={() => setIsMenuOpen(false)}>Policies</Link></li>
+            <li><Link to="/investor/corporate-governance" onClick={() => setIsMenuOpen(false)}>Corporate Governance</Link></li>
+          </ul>
+        </li>
         <li><Link to="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
       </ul>
     </nav>

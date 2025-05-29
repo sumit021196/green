@@ -2,7 +2,7 @@
     background-color: white;
     padding: 1rem 2rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
@@ -20,6 +20,8 @@
     gap: 2rem;
     margin: 0;
     padding: 0;
+    position: relative;
+    align-items: flex-start;
 }
 
 .nav-links a {
@@ -31,6 +33,152 @@
 
 .nav-links a:hover {
     color: #1E90FF;
+}
+
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+    height: 100%;
+}
+
+.dropdown-title {
+    cursor: pointer;
+    color: #333333;
+    font-weight: 500;
+    display: inline-block;
+    background: none;
+    border: none;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 270px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    z-index: 10;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.dropdown:hover .dropdown-menu,
+.dropdown:focus-within .dropdown-menu,
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-menu li,
+.dropdown-menu li.has-submenu {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-menu li:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-menu li a, .dropdown-menu li span {
+    display: block;
+    width: 100%;
+    padding: 0.85rem 2rem 0.85rem 2.5rem;
+    color: #222;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-menu li a:hover, .dropdown-menu li span:hover {
+    background: #f7f7f7;
+    color: #1E90FF;
+}
+
+.submenu-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.85rem 2rem 0.85rem 2.5rem;
+    color: #222;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.has-submenu .submenu-arrow {
+    font-size: 1.1em;
+    color: #888;
+    display: inline-block;
+}
+
+.has-submenu:hover .submenu-container {
+    background: #f7f7f7;
+    color: #1E90FF;
+}
+
+/* Remove bullet circles */
+.dropdown-menu li::before {
+    display: none;
+    content: none;
+}
+
+/* Fix for submenu arrow alignment */
+.has-submenu {
+    position: relative;
+}
+
+.has-submenu span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-right: 1.5rem;
+    position: relative;
+}
+.dropdown-menu li {
+    padding: 0;
+}
+.dropdown-menu li a {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: #333333;
+    white-space: nowrap;
+}
+.dropdown-menu li a:hover {
+    background: #f0f0f0;
+    color: #1E90FF;
+}
+.dropdown:hover .dropdown-menu,
+.dropdown-menu.show {
+    display: block;
+}
+
+/* For mobile: adjust dropdown positioning */
+@media screen and (max-width: 768px) {
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border-radius: 0;
+        min-width: 100%;
+        padding: 0;
+    }
+    .dropdown-menu li a {
+        padding: 1rem 2rem;
+    }
 }
 
 .hamburger {
