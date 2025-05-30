@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const timeoutRef = useRef(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -20,7 +21,7 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="logo">Globle Green</div>
+      <div className="logo">Globlegreen</div>
       <div className={`hamburger ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu}>
         <span></span>
         <span></span>
@@ -30,11 +31,27 @@ function Navbar() {
         <li><Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
         <li><Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
         <li className="dropdown"
-            onMouseEnter={() => setDropdownOpen(true)}
-            onMouseLeave={() => setDropdownOpen(false)}
+            onMouseEnter={() => {
+              clearTimeout(timeoutRef.current);
+              setDropdownOpen(true);
+            }}
+            onMouseLeave={() => {
+              timeoutRef.current = setTimeout(() => {
+                setDropdownOpen(false);
+              }, 300); // 300ms delay before closing
+            }}
         >
           <span className="dropdown-title">Investor Relation</span>
-          <ul className={`dropdown-menu${dropdownOpen ? ' show' : ''}`}>
+          <ul className={`dropdown-menu${dropdownOpen ? ' show' : ''}`}
+              onMouseEnter={() => {
+                clearTimeout(timeoutRef.current);
+              }}
+              onMouseLeave={() => {
+                timeoutRef.current = setTimeout(() => {
+                  setDropdownOpen(false);
+                }, 300);
+              }}
+          >
             <li><Link to="/investor" onClick={() => setIsMenuOpen(false)}>Financial Results</Link></li>
             <li><Link to="/investor/shareholding" onClick={() => setIsMenuOpen(false)}>Shareholding Pattern</Link></li>
             <li><Link to="/investor/disclosure" onClick={() => setIsMenuOpen(false)}>Stock Exchange Disclosure</Link></li>
