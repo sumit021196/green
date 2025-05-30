@@ -55,7 +55,7 @@
     position: absolute;
     top: calc(100% + 10px);
     left: 0;
-    min-width: 270px;
+    min-width: 300px; /* Increased width */
     background: #fff;
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     border-radius: 6px;
@@ -63,6 +63,7 @@
     padding: 0;
     margin: 0;
     list-style: none;
+    width: auto;
 }
 
 .dropdown:hover .dropdown-menu,
@@ -108,15 +109,24 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 0.85rem 2rem 0.85rem 2.5rem;
+    padding: 0.85rem 1rem 0.85rem 1.5rem;
     color: #222;
     background: none;
     border: none;
     text-align: left;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 400;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.submenu-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    padding-right: 10px;
 }
 
 .has-submenu .submenu-arrow {
@@ -139,6 +149,30 @@
 /* Fix for submenu arrow alignment */
 .has-submenu {
     position: relative;
+}
+
+.submenu-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.85rem 1.5rem 0.85rem 2.5rem;
+    color: #222;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.submenu-link:hover {
+    background: #f7f7f7;
+    color: #1E90FF;
+    text-decoration: none;
 }
 
 .has-submenu span {

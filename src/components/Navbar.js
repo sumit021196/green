@@ -57,18 +57,18 @@ function Navbar() {
             <li><Link to="/investor/disclosure" onClick={() => setIsMenuOpen(false)}>Stock Exchange Disclosure</Link></li>
             <li><Link to="/investor/grievance" onClick={() => setIsMenuOpen(false)}>Investor Grievance</Link></li>
             <li className="has-submenu">
-              <div className="submenu-container">
-                <span>Code Of Conduct</span>
+              <Link to="/investor/code-of-conduct" onClick={() => setIsMenuOpen(false)} className="submenu-link">
+                Code Of Conduct
                 <span className="submenu-arrow">&#8250;</span>
-              </div>
+              </Link>
               {/* Submenu can be implemented here */}
             </li>
             <li><Link to="/investor/statutory-document" onClick={() => setIsMenuOpen(false)}>Statutory Document</Link></li>
             <li className="has-submenu">
-              <div className="submenu-container">
-                <span>Shareholder's Help Desk</span>
+              <Link to="/investor/shareholders-help-desk" onClick={() => setIsMenuOpen(false)} className="submenu-link">
+                Shareholder's Help Desk
                 <span className="submenu-arrow">&#8250;</span>
-              </div>
+              </Link>
               {/* Submenu can be implemented here */}
             </li>
             <li><Link to="/investor/policies" onClick={() => setIsMenuOpen(false)}>Policies</Link></li>
