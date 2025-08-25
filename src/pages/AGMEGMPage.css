@@ -1,0 +1,36 @@
+.agm-egm-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.agm-egm-page h1 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.notice-list {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.notice-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.notice-title {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.notice-title:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
