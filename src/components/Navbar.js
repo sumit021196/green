@@ -96,7 +96,7 @@ function Navbar() {
                 <li><Link to="/investor/shareholders-help-desk/annual-return" onClick={() => setIsMenuOpen(false)}>Annual Return</Link></li>
               </ul>
             </li>
-            <li><Link to="/investor/policies" onClick={() => setIsMenuOpen(false)}>Policies</Link></li>
+            <li><Link to="/policies" onClick={() => setIsMenuOpen(false)}>Policies</Link></li>
             <li><Link to="/investor/corporate-governance" onClick={() => setIsMenuOpen(false)}>Corporate Governance</Link></li>
           </ul>
         </li>
