@@ -8,11 +8,19 @@ function AGMEGMPage() {
   const handleDownload = (e) => {
     e.preventDefault();
     const link = document.createElement('a');
-    link.href = '/pdf/Notice of 1st AGM_Globlegreen Power Limited.pdf';
+    link.href = process.env.PUBLIC_URL + '/pdf/Notice of 1st AGM_Globlegreen Power Limited.pdf';
     link.download = 'Notice of 1st AGM_Globlegreen Power Limited.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    
+    // For mobile devices
+    if (document.createEvent) {
+      const event = document.createEvent('MouseEvents');
+      event.initEvent('click', true, true);
+      link.dispatchEvent(event);
+    } else {
+      link.click();
+    }
   };
 
   return (
