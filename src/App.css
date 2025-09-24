@@ -31,3 +31,11 @@ main {
     flex: 1;
     padding: 2rem;
 } 
+.btn-green {
+    background-color: #24e007;
+    color: white;
+}
+
+.btn-green:hover {
+    background-color: #1cb306;
+}
