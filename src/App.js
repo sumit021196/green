@@ -6,6 +6,7 @@ import About from './pages/About';
 import Investor from './pages/Investor';
 import Contact from './pages/Contact';
 import AGMEGMPage from './pages/AGMEGMPage';
+import Disclosure from './pages/Disclosure';
 import Policies from './pages/Policies';
 import './App.css';
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/investor" element={<Investor />} />
           <Route path="/investor/shareholders-help-desk/agm-egm-notice" element={<AGMEGMPage />} />
+          <Route path="/investor/disclosure" element={<Disclosure />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/policies" element={<Policies />} />
         </Routes>
