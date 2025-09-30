@@ -5,7 +5,34 @@ import './Navbar.css';
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [expandedSubmenu, setExpandedSubmenu] = useState(null); // mobile-only accordion
   const timeoutRef = useRef(null);
+
+  // Flip nested submenu to left if it would overflow the viewport on the right
+  const handleSubmenuEnter = (e) => {
+    const li = e.currentTarget;
+    const submenu = li.querySelector('.submenu');
+    if (!submenu) return;
+    // Reset any previous flip
+    li.classList.remove('open-left');
+    // Temporarily reveal submenu to measure accurately
+    const prevDisplay = submenu.style.display;
+    const prevVisibility = submenu.style.visibility;
+    submenu.style.display = 'block';
+    submenu.style.visibility = 'hidden';
+    const submenuRect = submenu.getBoundingClientRect();
+    const willOverflowRight = submenuRect.right > window.innerWidth;
+    // Restore previous inline styles; CSS hover will control visibility
+    submenu.style.display = prevDisplay;
+    submenu.style.visibility = prevVisibility;
+    if (willOverflowRight) {
+      li.classList.add('open-left');
+    }
+  };
+
+  const handleSubmenuLeave = (e) => {
+    e.currentTarget.classList.remove('open-left');
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -16,6 +43,14 @@ function Navbar() {
     if (window.innerWidth <= 768) {
       e.preventDefault();
       setDropdownOpen((open) => !open);
+    }
+  };
+
+  // For mobile: toggle nested submenu accordions
+  const toggleSubmenu = (key, e) => {
+    if (window.innerWidth <= 768) {
+      e.preventDefault();
+      setExpandedSubmenu((prev) => (prev === key ? null : key));
     }
   };
 
@@ -30,7 +65,7 @@ function Navbar() {
       <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
         <li><Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
         <li><Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
-        <li className="dropdown"
+        <li className={`dropdown${dropdownOpen ? ' open' : ''}`}
             onMouseEnter={() => {
               clearTimeout(timeoutRef.current);
               setDropdownOpen(true);
@@ -41,8 +76,34 @@ function Navbar() {
               }, 300); // 300ms delay before closing
             }}
         >
-          <span className="dropdown-title">Investor Relation</span>
+          <span
+            className="dropdown-title"
+            onClick={() => {
+              if (window.innerWidth <= 768) {
+                setDropdownOpen((o) => !o);
+              }
+            }}
+            tabIndex={0}
+            aria-haspopup="true"
+            aria-expanded={dropdownOpen}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                if (window.innerWidth <= 768) {
+                  e.preventDefault();
+                  setDropdownOpen((o) => !o);
+                }
+              }
+            }}
+          >
+            Investor Relation <span className="caret" aria-hidden="true"></span>
+          </span>
           <ul className={`dropdown-menu${dropdownOpen ? ' show' : ''}`}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  setDropdownOpen(false);
+                  setIsMenuOpen(false);
+                }
+              }}
               onMouseEnter={() => {
                 clearTimeout(timeoutRef.current);
               }}
@@ -56,8 +117,8 @@ function Navbar() {
             <li><Link to="/investor/shareholding" onClick={() => setIsMenuOpen(false)}>Shareholding Pattern</Link></li>
             <li><Link to="/investor/disclosure" onClick={() => setIsMenuOpen(false)}>Stock Exchange Disclosure</Link></li>
             <li><Link to="/investor/grievance" onClick={() => setIsMenuOpen(false)}>Investor Grievance</Link></li>
-            <li className="has-submenu">
-              <Link to="/investor/code-of-conduct" onClick={handleDropdownClick} className="submenu-link">
+            <li className={`has-submenu${expandedSubmenu === 'coc' ? ' expanded' : ''}`} onMouseEnter={handleSubmenuEnter} onMouseLeave={handleSubmenuLeave}>
+              <Link to="/investor/code-of-conduct" onClick={(e) => toggleSubmenu('coc', e)} className="submenu-link">
                 Code Of Conduct
                 <span className="submenu-arrow">&#8250;</span>
               </Link>
@@ -66,8 +127,8 @@ function Navbar() {
                 <li><Link to="/investor/code-of-conduct/insider-trading" onClick={() => setIsMenuOpen(false)}>Insider trading code</Link></li>
               </ul>
             </li>
-            <li className="has-submenu">
-              <Link to="/investor/statutory-document" onClick={handleDropdownClick} className="submenu-link">
+            <li className={`has-submenu${expandedSubmenu === 'statutory' ? ' expanded' : ''}`} onMouseEnter={handleSubmenuEnter} onMouseLeave={handleSubmenuLeave}>
+              <Link to="/investor/statutory-document" onClick={(e) => toggleSubmenu('statutory', e)} className="submenu-link">
                 Statutory Document
                 <span className="submenu-arrow">&#8250;</span>
               </Link>
@@ -76,8 +137,8 @@ function Navbar() {
                 <li><Link to="/investor/statutory-document/offer-documents" onClick={() => setIsMenuOpen(false)}>Offer Documents</Link></li>
               </ul>
             </li>
-            <li className="has-submenu">
-              <Link to="/investor/shareholders-help-desk" onClick={handleDropdownClick} className="submenu-link">
+            <li className={`has-submenu${expandedSubmenu === 'shareholders' ? ' expanded' : ''}`} onMouseEnter={handleSubmenuEnter} onMouseLeave={handleSubmenuLeave}>
+              <Link to="/investor/shareholders-help-desk" onClick={(e) => toggleSubmenu('shareholders', e)} className="submenu-link">
                 Shareholder's Help Desk
                 <span className="submenu-arrow">&#8250;</span>
               </Link>

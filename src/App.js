@@ -9,6 +9,7 @@ import AGMEGMPage from './pages/AGMEGMPage';
 import Disclosure from './pages/Disclosure';
 import Policies from './pages/Policies';
 import './App.css';
+import ScrutinizersReportsPage from './pages/ScrutinizersReportsPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/investor" element={<Investor />} />
           <Route path="/investor/shareholders-help-desk/agm-egm-notice" element={<AGMEGMPage />} />
+          <Route path="/investor/shareholders-help-desk/scrutinizers-reports" element={<ScrutinizersReportsPage />} />
           <Route path="/investor/disclosure" element={<Disclosure />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/policies" element={<Policies />} />

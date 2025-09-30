@@ -17,7 +17,7 @@
 .nav-links {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 1.5rem; /* closer to Pico spacing scale */
     margin: 0;
     padding: 0;
     position: relative;
@@ -28,7 +28,9 @@
     text-decoration: none;
     color: #333333;
     font-weight: 500;
-    transition: color 0.3s ease;
+    font-size: 1rem; /* Pico base size */
+    line-height: 1.4;
+    transition: color 0.2s ease;
 }
 
 .nav-links a:hover {
@@ -45,9 +47,36 @@
     cursor: pointer;
     color: #333333;
     font-weight: 500;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     background: none;
     border: none;
+    padding: 0; /* avoid Pico nav/button padding */
+    margin: 0;  /* avoid any inherited margins */
+    box-shadow: none; /* ensure not styled as button */
+    text-decoration: none;
+}
+
+.dropdown-title:focus {
+    outline: 2px solid rgba(30,144,255,0.5);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Caret indicator */
+.caret {
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+}
+
+.dropdown.open .caret,
+.dropdown:focus-within .caret {
+    transform: rotate(-135deg);
 }
 
 .dropdown-menu {
@@ -58,18 +87,25 @@
     min-width: 300px; /* Increased width */
     background: #fff;
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    border-radius: 6px;
+    border-radius: 8px;
     z-index: 10;
     padding: 0;
     margin: 0;
     list-style: none;
     width: auto;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    pointer-events: none;
 }
 
 .dropdown:hover .dropdown-menu,
 .dropdown:focus-within .dropdown-menu,
 .dropdown-menu.show {
     display: block;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .dropdown-menu li,
@@ -87,7 +123,7 @@
 .dropdown-menu li a, .dropdown-menu li span {
     display: block;
     width: 100%;
-    padding: 0.85rem 2rem 0.85rem 2.5rem;
+    padding: 0.9rem 1.25rem 0.9rem 1.25rem; /* align with Pico comfortable touch target */
     color: #222;
     background: none;
     border: none;
@@ -133,6 +169,7 @@
     font-size: 1.1em;
     color: #888;
     display: inline-block;
+    transition: transform 0.2s ease;
 }
 
 .has-submenu:hover .submenu-container {
@@ -160,39 +197,45 @@
     min-width: 250px;
     background: #fff;
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    border-radius: 6px;
+    border-radius: 8px;
     z-index: 11;
     padding: 0;
     margin: 0;
     list-style: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    max-height: min(70vh, 480px);
+    overflow: auto;
+    overscroll-behavior: contain;
 }
 
 .has-submenu:hover .submenu,
 .has-submenu:focus-within .submenu {
     display: block;
+    opacity: 1;
+    transform: translateY(0);
 }
 
-/* For mobile devices */
-@media screen and (max-width: 768px) {
-    .submenu {
-        position: static;
-        box-shadow: none;
-        border-radius: 0;
-        width: 100%;
-        padding-left: 1rem;
-    }
-    
-    .submenu li a {
-        padding-left: 3rem;
-    }
+/* Flip submenu to the left when there isn't enough space on the right */
+.has-submenu.open-left > .submenu {
+    left: auto;
+    right: 100%;
 }
+
+.has-submenu.open-left > .submenu-link .submenu-arrow,
+.has-submenu.open-left .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+/* (Removed older mobile submenu override; replaced by accordion rules later) */
 
 .submenu-link {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 0.85rem 1.5rem 0.85rem 2.5rem;
+    padding: 0.9rem 1.25rem; /* same as parent items */
     color: #222;
     background: none;
     border: none;
@@ -219,35 +262,51 @@
     padding-right: 1.5rem;
     position: relative;
 }
-.dropdown-menu li {
-    padding: 0;
-}
-.dropdown-menu li a {
-    display: block;
-    padding: 0.75rem 1.5rem;
-    color: #333333;
-    white-space: nowrap;
-}
-.dropdown-menu li a:hover {
-    background: #f0f0f0;
-    color: #1E90FF;
-}
-.dropdown:hover .dropdown-menu,
-.dropdown-menu.show {
-    display: block;
-}
+/* (Removed duplicate dropdown item styles and simple show rules; using the enhanced versions above) */
 
 /* For mobile: adjust dropdown positioning */
 @media screen and (max-width: 768px) {
+    .nav-links {
+        gap: 0.25rem;
+    }
+    .nav-links a {
+        font-size: 1.05rem; /* slightly larger for readability */
+    }
     .dropdown-menu {
         position: static;
         box-shadow: none;
         border-radius: 0;
         min-width: 100%;
         padding: 0;
+        opacity: 1; /* show when .show is present */
+        transform: none;
+        transition: none;
+        pointer-events: auto;
     }
-    .dropdown-menu li a {
-        padding: 1rem 2rem;
+    .dropdown-menu li a,
+    .submenu-link {
+        padding: 1rem 1.25rem; /* comfortable tap targets (~44px) */
+    }
+    /* Mobile accordion behavior for nested submenus */
+    .has-submenu .submenu {
+        display: none;
+        position: static;
+        padding-left: 0.5rem;
+        max-height: none;
+        box-shadow: none;
+        border-radius: 0;
+        margin-left: 0.5rem;
+        border-left: 2px solid #f0f0f0;
+    }
+    .has-submenu.expanded > .submenu {
+        display: block;
+        max-height: 60vh;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .has-submenu.expanded > .submenu-link .submenu-arrow,
+    .has-submenu.expanded .submenu-arrow {
+        transform: rotate(90deg);
     }
 }
 
