@@ -168,8 +168,40 @@ function Navbar() {
             <Button component={NavLink} to="/about" color="inherit" sx={{
               '&.active': { color: 'primary.main', borderBottom: '2px solid', borderColor: 'primary.main' }
             }}>About</Button>
-            <Button color="inherit" onClick={openInvestorMenu}>Investor Relation</Button>
-            <Menu anchorEl={investorAnchorEl} open={Boolean(investorAnchorEl)} onClose={closeInvestorMenu}>
+            <Button 
+              color="inherit" 
+              onClick={openInvestorMenu}
+              onMouseEnter={openInvestorMenu}
+              sx={{
+                '&.active': { color: 'primary.main', borderBottom: '2px solid', borderColor: 'primary.main' },
+                '&:hover': { color: 'primary.main' }
+              }}
+            >
+              Investor Relation
+            </Button>
+            <Menu 
+              anchorEl={investorAnchorEl} 
+              open={Boolean(investorAnchorEl)} 
+              onClose={closeInvestorMenu}
+              MenuListProps={{
+                onMouseLeave: closeInvestorMenu,
+                sx: { 
+                  py: 0,
+                  '& .MuiList-padding': { py: 0 },
+                  '& .MuiMenuItem-root': { minHeight: '36px', fontSize: '0.875rem' },
+                  '& .MuiDivider-root': { my: '4px' },
+                  '& .Mui-disabled': { opacity: 1, color: 'text.primary', fontWeight: 'bold', fontSize: '0.875rem' }
+                }
+              }}
+              PaperProps={{
+                style: {
+                  maxHeight: '70vh',
+                  overflow: 'auto',
+                  marginTop: '8px',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                }
+              }}
+            >
               <MenuItem component={NavLink} to="/investor" onClick={closeInvestorMenu} sx={{ '&.active': { color: 'primary.main' }}}>Financial Results</MenuItem>
               <MenuItem component={NavLink} to="/investor/shareholding" onClick={closeInvestorMenu} sx={{ '&.active': { color: 'primary.main' }}}>Shareholding Pattern</MenuItem>
               <MenuItem component={NavLink} to="/investor/disclosure" onClick={closeInvestorMenu} sx={{ '&.active': { color: 'primary.main' }}}>Stock Exchange Disclosure</MenuItem>
